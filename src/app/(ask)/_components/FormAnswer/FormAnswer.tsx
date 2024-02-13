@@ -1,24 +1,22 @@
 "use client";
-import answerAction from "@/app/(ask)/actions/answer.action";
 import { useState } from "react";
+import axios from "axios";
 
 export default function FormAnswer(item: Ask) {
   const [formState, setFormState] = useState<Ask>();
+
+  async function send() {
+    if (!formState?.status || !formState?.text) return alert("НЕЛЬЗЯ");
+    await axios.post("/api/ask-answer", {
+      name: item.name,
+      idAsk: item.id,
+      answer: formState.text,
+      status: formState.status,
+    });
+  }
+
   return (
-    <form
-      className={"flex flex-col"}
-      key={item.id}
-      action={async () => {
-        if (!formState?.status || !formState?.text) return alert("Дурак");
-        if (formState && formState.status && formState.text) {
-          const res = await answerAction({
-            status: formState.status,
-            answer: formState.text,
-            id: item.id,
-          });
-        }
-      }}
-    >
+    <form className={"flex flex-col"} key={item.id} action={() => send()}>
       <h1>{item.name}</h1>
 
       <textarea
