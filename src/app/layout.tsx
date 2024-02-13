@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { ButtonExit } from "@/app/_components/ButtonExit";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,9 +17,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const token = cookies().has("token");
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="ru">
+      <body className={inter.className}>
+        <header>
+          <div className={"flex justify-end"}>{token && <ButtonExit />}</div>
+        </header>
+        {children}
+      </body>
     </html>
   );
 }
