@@ -2,7 +2,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import prisma from "../../../../../lib/prisma";
-import answerAction from "@/app/(ask)/actions/answer.action";
 import FormAnswer from "@/app/(ask)/_components/FormAnswer/FormAnswer";
 
 export default async function Page() {
@@ -20,7 +19,7 @@ export default async function Page() {
   return (
     <div>
       {data.map(({ id, name, text }) => (
-        <FormAnswer id={id} name={name} text={text} />
+        <FormAnswer key={id} id={id} name={name} text={text} />
       ))}
     </div>
   );
