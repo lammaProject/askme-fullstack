@@ -1,74 +1,105 @@
 "use client";
 import { HTMLInputTypeAttribute, useState } from "react";
-import { useFormStatus } from "react-dom";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useSocket } from "../../../../store/store";
 
 interface FormAuth {
   title: string;
   items: { type: HTMLInputTypeAttribute; name: string; placeholder: string }[];
-  action: (formData: FormData) => Promise<object | { error: unknown }>;
   messageSuccess: string;
   buttonText: string;
   titleMessage: string;
   link: string;
   linkMessage: string;
+  data: (formData: FormData) => {};
+  linkApi: "/api/auth/login" | "/api/auth/register";
 }
 
 export default function FormAuth({
   title,
   items,
-  action,
-  messageSuccess,
   buttonText,
   titleMessage,
   link,
   linkMessage,
+  data,
+  linkApi,
 }: FormAuth) {
+  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-  const [toMain, setToMain] = useState(false);
-  const { pending } = useFormStatus();
+
+  const navigate = useRouter();
+
+  const setSocketDisconnect = useSocket((store) => store.setDisconnect);
+  const actionForm = (formData: FormData) => {
+    setLoading(true);
+
+    axios
+      .post(linkApi, data(formData))
+      .then((res) => {
+        if (res.data.status === "success") {
+          setSocketDisconnect(false);
+          navigate.push("/");
+          setLoading(false);
+        }
+        setLoading(false);
+      })
+      .catch((e) => {
+        setStatus(e.response.data.message);
+        setLoading(false);
+      });
+  };
 
   return (
-    <form
-      action={async (formData) => {
-        const res: any = await action(formData);
-        if (res?.error) {
-          setStatus(res.error);
-        }
-        if (res?.id) {
-          setStatus(`${res.name} ${messageSuccess}`);
-          setToMain(true);
-        }
-      }}
-    >
-      <h1>{title}</h1>
-      {items.map((input, index) => {
-        return (
-          <input
-            key={index}
-            className={"bg-[black]"}
-            type={input.type}
-            name={input.name}
-            placeholder={input.placeholder}
-            required={true}
-          />
-        );
-      })}
+    <div>
+      <h1 className={"card-title"}>{title}</h1>
+      <form className={"card-body"} action={actionForm}>
+        {items.map((input, index) => {
+          return (
+            <input
+              className="input input-bordered flex items-center gap-2"
+              key={index}
+              type={input.type}
+              name={input.name}
+              placeholder={input.placeholder}
+              required={true}
+            />
+          );
+        })}
 
-      <button disabled={toMain} type={"submit"}>
-        {pending ? "Проверка" : buttonText}
-      </button>
-      {status && <div>{status}</div>}
-      {toMain && (
-        <Link className={"text-red-600"} href={"/"}>
-          Перейти на главную
-        </Link>
-      )}
+        {loading ? (
+          <span className="loading loading-ball loading-lg"></span>
+        ) : (
+          <button className={"btn"} type={"submit"}>
+            {buttonText}
+          </button>
+        )}
+        {status && (
+          <div role="alert" className="alert alert-error">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{status}</span>
+          </div>
+        )}
+      </form>
 
-      <div className={"p-2 bg-gray-600 h-28 flex flex-col justify-center"}>
-        <h1 className={"text-red-600"}>{titleMessage}</h1>
+      <div className={"card items-center"}>
+        <h1 className={"card-title"}>{titleMessage}</h1>
         <Link href={link}>{linkMessage}</Link>
       </div>
-    </form>
+    </div>
   );
 }

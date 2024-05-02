@@ -1,5 +1,5 @@
+"use client";
 import FormAuth from "@/app/(auth)/_components/FormAuth";
-import registerAction from "@/app/(auth)/actions/register.action";
 
 export default function Page() {
   return (
@@ -7,12 +7,23 @@ export default function Page() {
       title={"Регистрация"}
       items={[
         { type: "text", name: "name", placeholder: "name" },
-        { type: "password", name: "password", placeholder: "password" },
         { type: "email", name: "email", placeholder: "email" },
+        { type: "password", name: "password", placeholder: "password" },
+        {
+          type: "password",
+          name: "passwordConfirm",
+          placeholder: "passwordConfirm",
+        },
       ]}
-      action={registerAction}
+      linkApi={"/api/auth/register"}
+      data={(formData) => ({
+        name: formData.get("name"),
+        email: formData.get("email"),
+        password: formData.get("password"),
+        passwordConfirm: formData.get("passwordConfirm"),
+      })}
       messageSuccess={"Вы успешно зарегестрировались!"}
-      buttonText={"Зарегестрироваться"}
+      buttonText={"Зарегистрироваться"}
       titleMessage={"У вас уже есть аккаунт?"}
       link={"/auth"}
       linkMessage={"Войти"}
