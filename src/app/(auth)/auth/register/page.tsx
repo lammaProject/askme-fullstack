@@ -1,5 +1,5 @@
 "use client";
-import FormAuth from "@/app/(auth)/_components/FormAuth";
+import FormAuth from "@/app/(auth)/_components/FormAuth/FormAuth";
 
 export default function Page() {
   return (

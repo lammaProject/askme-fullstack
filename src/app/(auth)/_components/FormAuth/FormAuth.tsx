@@ -1,21 +1,11 @@
 "use client";
-import { HTMLInputTypeAttribute, useState } from "react";
+
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useSocket } from "../../../../store/store";
-
-interface FormAuth {
-  title: string;
-  items: { type: HTMLInputTypeAttribute; name: string; placeholder: string }[];
-  messageSuccess: string;
-  buttonText: string;
-  titleMessage: string;
-  link: string;
-  linkMessage: string;
-  data: (formData: FormData) => {};
-  linkApi: "/api/auth/login" | "/api/auth/register";
-}
+import { FormAuth } from "@/app/(auth)/_components/FormAuth/interface";
+import { useSocket } from "@/store/store";
 
 export default function FormAuth({
   title,
@@ -47,7 +37,12 @@ export default function FormAuth({
         setLoading(false);
       })
       .catch((e) => {
-        setStatus(e.response.data.message);
+        if (e.response.data.message.includes("prisma.user.findUnique()")) {
+          setStatus("Ошибка не подключена база данных");
+        } else {
+          setStatus(e.response.data.message);
+        }
+
         setLoading(false);
       });
   };
@@ -76,6 +71,7 @@ export default function FormAuth({
             {buttonText}
           </button>
         )}
+
         {status && (
           <div role="alert" className="alert alert-error">
             <svg
