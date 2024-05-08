@@ -1,15 +1,18 @@
 "use client";
+
 import { useCookies } from "react-cookie";
-import { useRouter } from "next/navigation";
-import { useDashboard } from "../../../../store/store";
+import { usePathname, useRouter } from "next/navigation";
+import { useDashboard } from "@/store/store";
 
 export default function InChatInfo() {
+  const usernameSend = usePathname().split("/")[3];
+
   const [{ username }] = useCookies();
 
   const redirect = useRouter();
 
-  const setOpenChat = useDashboard((store: any) => store.setOpenChat);
-  const online = useDashboard((store: any) => store.isOnlineInChat);
+  const setOpenChat = useDashboard((store) => store.setOpenChat);
+  const online = useDashboard((store) => store.isOnlineInChat);
   const handleExit = () => {
     setOpenChat(false);
     redirect.replace("/dashboard");
@@ -17,7 +20,7 @@ export default function InChatInfo() {
 
   return (
     <div className={"bg-neutral rounded-[15px] p-4 flex flex-col"}>
-      {online && (
+      {online.isOnline && (
         <div
           className={
             "bg-success text-white rounded-[15px] text-center mb-2 p-2"
@@ -39,7 +42,7 @@ export default function InChatInfo() {
       <input
         disabled
         type="text"
-        placeholder={online.toString()}
+        placeholder={usernameSend}
         className={`input mb-2 w-full color-secondary`}
       />
       <button onClick={handleExit} className="btn btn-error">

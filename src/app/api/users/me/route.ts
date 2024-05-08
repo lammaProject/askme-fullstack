@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getErrorResponse } from "../../../../../lib/helpres";
-import prisma from "../../../../../lib/prisma";
+import { getErrorResponse } from "@/lib/helpres";
+import prisma from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   const userId = req.headers.get("X-USER-ID");

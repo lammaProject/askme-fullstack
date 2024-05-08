@@ -1,8 +1,8 @@
 "use server";
-import ChangeTheme from "@/app/_components/ChangeTheme";
 import { ButtonExit } from "@/app/(dashboard)/_components/ButtonExit";
 import { cookies } from "next/headers";
 import Avatar from "@/app/(dashboard)/_components/Avatar";
+import ChangeTheme from "@/components/ChangeTheme";
 
 const Header = async () => {
   let theme = cookies().get("theme")?.value;

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { hash } from "bcryptjs";
 import {
   RegisterUserInput,
   RegisterUserSchema,
-} from "../../../../../lib/validations/user.schema";
-import { hash } from "bcryptjs";
-import prisma from "../../../../../lib/prisma";
-import { getEnvVariable, getErrorResponse } from "../../../../../lib/helpres";
-import { signJWT } from "../../../../../lib/token";
+} from "@/lib/validations/user.schema";
+import prisma from "@/lib/prisma";
+import { getEnvVariable, getErrorResponse } from "@/lib/helpres";
+import { signJWT } from "@/lib/token";
 
 export async function POST(req: NextRequest) {
   try {

@@ -1,23 +1,27 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import axios from "axios";
-import { useDashboard, useSocket } from "../../../../store/store";
-import UserOnline from "@/app/(dashboard)/_components/UserOnline";
-import InChatInfo from "@/app/(dashboard)/_components/InChatInfo";
 import { useCookies } from "react-cookie";
 import { socket } from "@/socket";
+import UserOnline from "@/app/(dashboard)/_components/UserOnline";
+import InChatInfo from "@/app/(dashboard)/_components/InChatInfo";
+import { useDashboard } from "@/store/store";
 
 export function LeftSide() {
+  const [errorSocket, setErrorSocket] = useState(false);
   const [data, setData] = useState<Array<string>>([""]);
   const [newUser, setNewUser] = useState("");
 
   const [{ username }] = useCookies();
 
-  const chat = useDashboard((store: any) => store.openChat);
+  const chat = useDashboard((store) => store.openChat);
 
   useEffect(() => {
     socket.on("users_online", onConnect);
+    socket.on("connect_error", () => {
+      socket.off("users_online", onConnect);
+      setErrorSocket(true);
+    });
 
     socket.emit("users_online", username);
     socket.emit("users_online", "update");
@@ -42,9 +46,16 @@ export function LeftSide() {
     };
   }, []);
 
+  if (errorSocket)
+    return (
+      <div className={"mr-2 menu p-6 w-full text-center"}>
+        Не удалость подключиться к списку
+      </div>
+    );
+
   return (
     <div className={"mr-2"}>
-      <ul className="menu bg-base-200 rounded-box w-64 p-6 w-full">
+      <ul className="menu bg-base-200 rounded-box p-6 w-full">
         <a className={"text-center text-[18px] mb-2"}>Пользователи онлайн</a>
         {!data?.length ? (
           <span className="loading loading-ring loading-md"></span>

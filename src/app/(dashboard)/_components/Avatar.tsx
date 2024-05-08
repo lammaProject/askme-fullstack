@@ -1,10 +1,7 @@
 "use client";
 
-import { useQuery } from "react-query";
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import useGetDashboardInfo from "@/app/(dashboard)/hooks/useGetDashboardInfo";
+import useGetDashboardInfo from "@/app/(dashboard)/_hooks/useGetDashboardInfo";
 
 export default function Avatar() {
   const { name, isLoading } = useGetDashboardInfo();

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getErrorResponse } from "../lib/helpres";
-import { verifyJWT } from "../lib/token";
-import { cookies } from "next/headers";
+import { getErrorResponse } from "@/lib/helpres";
+import { verifyJWT } from "@/lib/token";
 
 export interface AuthenticatedRequest extends NextRequest {
   user: {
@@ -11,9 +10,9 @@ export interface AuthenticatedRequest extends NextRequest {
 
 let redirectToLogin = false;
 export async function middleware(req: NextRequest) {
-  if (req.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL(`/dashboard`, req.url));
-  }
+  // if (req.nextUrl.pathname === "/") {
+  //   return NextResponse.redirect(new URL(`/dashboard`, req.url));
+  // }
   let token: string | undefined;
 
   if (req.cookies.has("token")) {

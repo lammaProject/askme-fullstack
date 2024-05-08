@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import prisma from "../../../../lib/prisma";
+import prisma from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   const chatReq = req.nextUrl.searchParams;
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   return Response.json({ status: "ok", chat });
 }
 
-export async function POST(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   const { text, chatAll } = await req.json();
 
   const chat = await prisma.chat.findUnique({
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (chat && chat.text) {
-    const newText = [...chat.text, text];
+    const newText = [...(chat.text as Array<string>), text];
     const newChat = await prisma.chat.update({
       where: { chatAll },
       data: { text: newText },

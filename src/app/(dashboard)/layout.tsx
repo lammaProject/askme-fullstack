@@ -1,5 +1,6 @@
-import Header from "@/app/(dashboard)/_components/Header";
-import { LeftSide } from "@/app/(dashboard)/_components/LeftSide";
+import Header from "./_components/Header";
+import { LeftSide } from "./_components/LeftSide";
+import React from "react";
 
 export default function DashboardLayout({
   children,

@@ -1,8 +1,5 @@
 import { NextRequest } from "next/server";
-import prisma from "../../../../lib/prisma";
-import { jwtDecrypt } from "jose";
-import { cookies } from "next/headers";
-import { getErrorResponse } from "../../../../lib/helpres";
+import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const { name, idUser } = await req.json();

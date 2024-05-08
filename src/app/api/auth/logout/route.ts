@@ -1,17 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "../../../../../lib/prisma";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
-  const userId = req.headers.get("X-USER-ID");
+export async function GET() {
   const response = new NextResponse(JSON.stringify({ status: "success" }), {
     status: 200,
     headers: { "Content-Type": "application/json" },
-  });
-
-  await prisma.leftside.delete({
-    where: {
-      idUser: userId,
-    },
   });
 
   await Promise.all([
@@ -22,6 +14,11 @@ export async function GET(req: NextRequest) {
     }),
     response.cookies.set({
       name: "logged-in",
+      value: "",
+      maxAge: -1,
+    }),
+    response.cookies.set({
+      name: "username",
       value: "",
       maxAge: -1,
     }),

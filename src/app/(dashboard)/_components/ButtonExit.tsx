@@ -1,32 +1,17 @@
 "use client";
 
-import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useBearStore, useSocket } from "../../../../store/store";
-import { QueryClient } from "react-query";
+import { http } from "@/http";
 
 export const ButtonExit = () => {
-  const queryClient = new QueryClient();
   const navigate = useRouter();
 
-  const setSocketDisconnect = useSocket((store) => store.setDisconnect);
+  const handleExit = async () => {
+    await http.get("/auth/logout").then(() => navigate.push("/auth"));
+  };
 
   return (
-    <button
-      onClick={() => {
-        axios.get("/api/auth/logout").then((res) => {
-          if (res.data.status === "success") {
-            setSocketDisconnect(true);
-            queryClient.invalidateQueries({
-              queryKey: ["leftside"],
-            });
-            navigate.push("/auth");
-          }
-        });
-      }}
-      type={"submit"}
-      className={"btn"}
-    >
+    <button onClick={handleExit} className={"btn"}>
       Выход
     </button>
   );

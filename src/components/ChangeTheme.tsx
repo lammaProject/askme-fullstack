@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 
 export default function ChangeTheme({

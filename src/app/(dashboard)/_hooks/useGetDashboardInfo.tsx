@@ -1,10 +1,9 @@
-import { useQuery } from "react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 const useGetDashboardInfo = () => {
   const [name, setName] = useState("");
-  const [leftUser, setLeftUser] = useState("");
 
   const { data: meData, isLoading } = useQuery({
     queryKey: ["user"],
@@ -22,11 +21,6 @@ const useGetDashboardInfo = () => {
         });
     }
   }, [meData]);
-
-  // const { data: leftSideData, refetch: refetchLeftSide } = useQuery({
-  //   queryKey: ["leftside"],
-  //   queryFn: () => axios.post("/api/leftside", { name }),
-  // });
 
   return { name, isLoading };
 };

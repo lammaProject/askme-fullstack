@@ -1,45 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
-import axios from "axios";
-import { useMutation, useQueryClient } from "react-query";
+import React, { useEffect, useState } from "react";
+import { useDashboard } from "@/store/store";
 import { socket } from "@/socket";
-import { useDashboard } from "../../../../store/store";
+import ChatDisplay from "@/app/(dashboard)/_components/ChatDisplay";
+import useChat from "@/app/(dashboard)/_hooks/useChat";
 
-export default function Chat({ data }: { data: any }) {
-  const queryClient = useQueryClient();
-
-  const [{ username }] = useCookies();
-
-  const [chat, setChat] = useState<{
-    username: string;
-    chatAll: String;
-    usernameSend: string;
-    text: {}[];
-  }>();
+export default function Chat({
+  username,
+  usernameSend,
+}: {
+  username: string;
+  usernameSend: string;
+}) {
   const [value, setValue] = useState("");
   const [repeatOnline, setRepeatOnline] = useState(3);
 
-  const setIsOnlineChat = useDashboard((store: any) => store.setIsOnlineInChat);
+  const { chat, addMesage, invalidate } = useChat(username, usernameSend);
+
+  const setOpenChat = useDashboard((store: any) => store.setOpenChat);
 
   useEffect(() => {
-    if (data) {
-      setChat(data.data.chat);
-      socket.emit("chat", { roomId: data.data.chat.chatAll, username });
-    }
-  }, [data]);
+    setOpenChat(true);
+  }, []);
 
   useEffect(() => {
-    socket.on(`isOnline`, onConnect);
+    socket.on(`isOnline`, onIsOnline);
+    socket.on("message", onMessage);
 
-    function onConnect(args: string) {
+    function onIsOnline(args: string) {
       console.log(args);
-      if (args !== username) setIsOnlineChat(true);
+    }
+
+    async function onMessage() {
+      return await invalidate();
     }
 
     return () => {
-      socket.off("isOnline", onConnect);
+      socket.off("isOnline", onIsOnline);
+      socket.off("message", onMessage);
     };
   }, []);
 
@@ -58,65 +57,45 @@ export default function Chat({ data }: { data: any }) {
     };
   }, [repeatOnline]);
 
-  const mutation = useMutation({
-    mutationKey: ["chatUpdate"],
-    mutationFn: (newTodo: any) => {
-      return axios.post("/api/chat", newTodo);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries("chat");
-    },
-  });
-
-  const handleInputMessage = (event: React.FormEvent<HTMLTextAreaElement>) => {
+  const handleInputMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   };
 
+  const sendMessage = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    socket.emit("chat", { message: value });
+
+    addMesage.mutate({
+      chatAll: chat!.chatAll,
+      text: { [username]: value },
+    });
+
+    setValue("");
+  };
+
   return (
-    <div
+    <form
+      onSubmit={sendMessage}
       className={"flex flex-col justify-between bg-primary p-4 rounded-[15px]"}
     >
-      <div className={"mb-2 max-h-[60vh] overflow-y-auto"}>
-        {chat?.text?.length &&
-          chat?.text.map((i: any, index) => {
-            if (username in i) {
-              return (
-                <div key={index} className="chat chat-end">
-                  <div className="chat-bubble">{Object.values(i)}</div>
-                </div>
-              );
-            }
-
-            return (
-              <div key={index} className="chat chat-start">
-                <div className="chat-bubble">{Object.values(i)}</div>
-              </div>
-            );
-          })}
-      </div>
+      <ChatDisplay chat={chat} username={username} />
 
       <div className={"w-full grid grid-cols-3"}>
-        <textarea
+        <input
           className="textarea textarea-accent col-span-2 mr-2 resize-none"
           placeholder="Написать сообщение"
           onChange={handleInputMessage}
           value={value}
         />
         <button
+          type={"submit"}
           disabled={!value}
-          onClick={() => {
-            mutation.mutate({
-              chatAll: chat?.chatAll,
-              text: { [username]: value },
-            });
-
-            setValue("");
-          }}
           className="btn btn-accent h-full"
         >
           Отправить
         </button>
       </div>
-    </div>
+    </form>
   );
 }
