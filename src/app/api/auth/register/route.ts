@@ -7,7 +7,7 @@ import {
 } from "@/lib/validations/user.schema";
 import prisma from "@/lib/prisma";
 import { getEnvVariable, getErrorResponse } from "@/lib/helpres";
-import { signJWT } from "@/lib/token";
+import { signJWT } from "@/lib/auth/token";
 
 export async function POST(req: NextRequest) {
   try {

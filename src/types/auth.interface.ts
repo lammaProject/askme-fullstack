@@ -9,5 +9,5 @@ export interface FormAuth {
   link: string;
   linkMessage: string;
   data: (formData: FormData) => {};
-  linkApi: "/api/auth/login" | "/api/auth/register";
+  linkApi: string;
 }

@@ -5,7 +5,6 @@ type EnvVariableKey = "JWT_SECRET_KEY" | "JWT_EXPIRES_IN";
 
 export function getEnvVariable(key: EnvVariableKey): string {
   const value = process.env[key];
-  console.log(value);
   if (!value || value.length === 0) {
     console.error(`The environment variable ${key} is not set.`);
     throw new Error(`The environment variable ${key} is not set.`);
@@ -19,15 +18,12 @@ export function getErrorResponse(
   message: string,
   errors: ZodError | null = null,
 ) {
-  return new NextResponse(
-    JSON.stringify({
+  return NextResponse.json(
+    {
       status: status < 500 ? "fail" : "error",
       message,
-      errors: errors ? errors.flatten() : null,
-    }),
-    {
-      status,
-      headers: { "Content-Type": "application/json" },
+      errors: errors,
     },
+    { status, headers: { "Content-Type": "application/json" } },
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+
 import FormAuth from "@/app/(auth)/_components/FormAuth/FormAuth";
 
 export default function Page() {
@@ -13,7 +14,7 @@ export default function Page() {
           placeholder: "password",
         },
       ]}
-      linkApi={"/api/auth/login"}
+      linkApi={"/auth/login"}
       data={(formData) => ({
         email: formData.get("email"),
         password: formData.get("password"),

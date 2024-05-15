@@ -15,7 +15,6 @@ const useChat = (username: string, usernameSend: string) => {
   });
 
   useEffect(() => {
-    console.log(data);
     if (data) {
       setChat(data.chat);
       socket.emit("chat", { roomId: data.chat.chatAll, username });
@@ -23,7 +22,6 @@ const useChat = (username: string, usernameSend: string) => {
   }, [data]);
 
   // update
-
   const addMesage = useMutation({
     mutationKey: ["chatUpdate"],
     mutationFn: sendMessage,

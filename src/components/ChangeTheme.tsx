@@ -1,20 +1,44 @@
 "use client";
 
-import { useEffect } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-export default function ChangeTheme({
-  defaultChecked,
-}: {
-  defaultChecked: string;
-}) {
-  const [_, setCookies] = useCookies(["theme"]);
+export default function ChangeTheme() {
+  const [checked, setChecked] = useState(false);
+
+  const [{ theme }, setCookies] = useCookies(["theme"]);
+
   useEffect(() => {
-    document.documentElement.setAttribute(
-      "data-theme",
-      localStorage.getItem("theme") === "synthwave" ? "synthwave" : "autumn",
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches &&
+      !localStorage.getItem("theme")
+    ) {
+      setThemeAttribute("dark");
+    }
+
+    if (theme === "dark") {
+      setChecked(true);
+    }
+
+    setThemeAttribute(
+      localStorage.getItem("theme") === "dark" ? "dark" : "autumn",
     );
   }, []);
+
+  const setThemeAttribute = (theme: string) => {
+    document.documentElement.setAttribute("data-theme", theme);
+  };
+
+  const handleChangeTheme = (
+    event: SyntheticEvent<HTMLInputElement, Event>,
+  ) => {
+    setChecked((prev) => !prev);
+    let newTheme = (event as any).target.checked ? "dark" : "autumn";
+    localStorage.setItem("theme", newTheme);
+    setCookies("theme", newTheme);
+    setThemeAttribute(newTheme);
+  };
 
   return (
     <label className="flex cursor-pointer gap-2">
@@ -35,13 +59,8 @@ export default function ChangeTheme({
       <input
         type="checkbox"
         className="toggle"
-        defaultChecked={defaultChecked === "synthwave"}
-        onClick={(e) => {
-          let newTheme = (e as any).target.checked ? "synthwave" : "autumn";
-          localStorage.setItem("theme", newTheme);
-          setCookies("theme", newTheme);
-          document.documentElement.setAttribute("data-theme", newTheme);
-        }}
+        checked={checked}
+        onClick={handleChangeTheme}
       />
       <svg
         xmlns="http://www.w3.org/2000/svg"

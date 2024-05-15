@@ -5,7 +5,7 @@ import { useCookies } from "react-cookie";
 import { socket } from "@/socket";
 import UserOnline from "@/app/(dashboard)/_components/UserOnline";
 import InChatInfo from "@/app/(dashboard)/_components/InChatInfo";
-import { useDashboard } from "@/store/store";
+import { useDashboard } from "@/app/_providers/store.provider";
 
 export function LeftSide() {
   const [errorSocket, setErrorSocket] = useState(false);

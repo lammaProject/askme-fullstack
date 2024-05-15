@@ -7,8 +7,8 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   daisyui: {
-    themes: ["autumn", "synthwave"],
+    themes: ["dark", "autumn"],
   },
-  plugins: [require("daisyui")],
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
 };
 export default config;

@@ -1,4 +1,4 @@
-import { getEnvVariable } from "./helpres";
+import { getEnvVariable } from "../helpres";
 import { SignJWT, jwtVerify } from "jose";
 
 export const signJWT = async (

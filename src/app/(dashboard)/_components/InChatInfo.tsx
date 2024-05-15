@@ -2,7 +2,7 @@
 
 import { useCookies } from "react-cookie";
 import { usePathname, useRouter } from "next/navigation";
-import { useDashboard } from "@/store/store";
+import { useDashboard } from "@/app/_providers/store.provider";
 
 export default function InChatInfo() {
   const usernameSend = usePathname().split("/")[3];
@@ -13,6 +13,8 @@ export default function InChatInfo() {
 
   const setOpenChat = useDashboard((store) => store.setOpenChat);
   const online = useDashboard((store) => store.isOnlineInChat);
+
+  console.log(online);
   const handleExit = () => {
     setOpenChat(false);
     redirect.replace("/dashboard");

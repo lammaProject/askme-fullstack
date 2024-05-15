@@ -1,28 +1,24 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { User } from "@/types/dashboard.interface";
+import { getUserMe } from "@/app/(dashboard)/_api/users.api";
 
 const useGetDashboardInfo = () => {
-  const [name, setName] = useState("");
+  const [userData, setUserData] = useState<User | null>(null);
 
-  const { data: meData, isLoading } = useQuery({
+  const { data: fetchedData, isLoading } = useQuery({
     queryKey: ["user"],
-    queryFn: () => axios.get("/api/users/me"),
+    queryFn: getUserMe,
     refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    if (meData && meData.data.status === "success") {
-      setName(meData.data.data.user.name);
-      if (!name)
-        void axios.post("/api/leftside", {
-          name: meData.data.data.user.name,
-          idUser: meData.data.data.user.id,
-        });
+    if (fetchedData) {
+      setUserData(fetchedData.data.user);
     }
-  }, [meData]);
+  }, [fetchedData]);
 
-  return { name, isLoading };
+  return { userData, isLoading };
 };
 
 export default useGetDashboardInfo;

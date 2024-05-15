@@ -4,7 +4,7 @@ import { ZodError } from "zod";
 import { LoginUserInput, LoginUserSchema } from "@/lib/validations/user.schema";
 import prisma from "@/lib/prisma";
 import { getEnvVariable, getErrorResponse } from "@/lib/helpres";
-import { signJWT } from "@/lib/token";
+import { signJWT } from "@/lib/auth/token";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user || !(await compare(data.password, user.password))) {
-      return getErrorResponse(401, "Invalid email or password");
+      return getErrorResponse(401, "Неправильная почта или пароль");
     }
 
     const JWT_EXPIRES_IN = getEnvVariable("JWT_EXPIRES_IN");
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error: any) {
     if (error instanceof ZodError) {
-      return getErrorResponse(400, "failed validations", error);
+      return getErrorResponse(400, "Ошибка валидации", error);
     }
 
     return getErrorResponse(500, error.message);

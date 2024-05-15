@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useDashboard } from "@/store/store";
 import { socket } from "@/socket";
 import ChatDisplay from "@/app/(dashboard)/_components/ChatDisplay";
 import useChat from "@/app/(dashboard)/_hooks/useChat";
+import { useDashboard } from "@/app/_providers/store.provider";
+// @ts-ignore
+import useSound from "use-sound";
 
 export default function Chat({
   username,
@@ -13,6 +15,11 @@ export default function Chat({
   username: string;
   usernameSend: string;
 }) {
+  const [notify, setNotify] = useState(false);
+  const [play] = useSound("/sounds/sendMessage.mp3", {
+    volume: 0.1,
+  });
+
   const [value, setValue] = useState("");
   const [repeatOnline, setRepeatOnline] = useState(3);
 
@@ -32,7 +39,10 @@ export default function Chat({
       console.log(args);
     }
 
-    async function onMessage() {
+    async function onMessage(e: string | null) {
+      if (e) {
+        setNotify((prev) => !prev);
+      }
       return await invalidate();
     }
 
@@ -41,6 +51,10 @@ export default function Chat({
       socket.off("message", onMessage);
     };
   }, []);
+
+  useEffect(() => {
+    play();
+  }, [notify]);
 
   useEffect(() => {
     const check = setTimeout(() => {

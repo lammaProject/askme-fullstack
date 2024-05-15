@@ -15,7 +15,7 @@ export default function Page() {
           placeholder: "passwordConfirm",
         },
       ]}
-      linkApi={"/api/auth/register"}
+      linkApi={"/auth/register"}
       data={(formData) => ({
         name: formData.get("name"),
         email: formData.get("email"),

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getErrorResponse } from "@/lib/helpres";
-import { verifyJWT } from "@/lib/token";
+import { verifyJWT } from "@/lib/auth/token";
 
 export interface AuthenticatedRequest extends NextRequest {
   user: {
@@ -10,15 +10,16 @@ export interface AuthenticatedRequest extends NextRequest {
 
 let redirectToLogin = false;
 export async function middleware(req: NextRequest) {
-  // if (req.nextUrl.pathname === "/") {
-  //   return NextResponse.redirect(new URL(`/dashboard`, req.url));
-  // }
   let token: string | undefined;
 
   if (req.cookies.has("token")) {
     token = req.cookies.get("token")?.value;
   } else if (req.headers.get("Authorization")?.startsWith("Bearer ")) {
     token = req.headers.get("Authorization")?.substring(7);
+  }
+
+  if (req.nextUrl.pathname.startsWith("/auth") && token) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   if (req.nextUrl.pathname.startsWith("/auth") && (!token || redirectToLogin))
@@ -53,14 +54,10 @@ export async function middleware(req: NextRequest) {
   if (!authUser) {
     return NextResponse.redirect(new URL(`/auth`, req.url));
   }
-  //
-  // if (req.url.includes("/auth") && authUser) {
-  //   return NextResponse.redirect(new URL("/profile", req.url));
-  // }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/api/users/:path*", "/api/auth/logout"],
+  matcher: ["/dashboard/:path*", "/api/users/:path*", "/api/auth/logout"],
 };

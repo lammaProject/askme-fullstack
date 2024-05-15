@@ -8,3 +8,12 @@ export interface Chat {
 export type GetChat = {
   chat: Chat;
 };
+
+export interface User {
+  id: string;
+  name: string;
+  photo?: string;
+  role: string;
+  verified: boolean;
+  email: string;
+}
