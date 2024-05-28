@@ -1,4 +1,3 @@
-"use server";
 import { ButtonExit } from "@/app/(dashboard)/_components/ButtonExit";
 import Avatar from "@/app/(dashboard)/_components/Avatar";
 import ChangeTheme from "@/components/ChangeTheme";

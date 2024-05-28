@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import * as process from "process";
 import { NextRequest, NextResponse } from "next/server";
-import { getEnvVariable } from "@/lib/helpres";
+import { getEnvVariable, getErrorResponse } from "@/lib/helpres";
 import { signJWT } from "@/lib/auth/token";
 import prisma from "@/lib/prisma";
 import { hash } from "bcryptjs";
@@ -24,83 +24,88 @@ export function GET() {
 
 export async function POST(req: NextRequest) {
   const { code } = await req.json();
+
   if (code) {
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
-    const { data } = await oauth2.userinfo.get({ auth: oauth2Client });
+    try {
+      const { tokens } = await oauth2Client.getToken(code);
+      oauth2Client.setCredentials(tokens);
+      const { data } = await oauth2.userinfo.get({ auth: oauth2Client });
 
-    if (data) {
-      const JWT_EXPIRES_IN = getEnvVariable("JWT_EXPIRES_IN");
+      if (data) {
+        const JWT_EXPIRES_IN = getEnvVariable("JWT_EXPIRES_IN");
 
-      const token = await signJWT(
-        { sub: data.id! },
-        { exp: `${JWT_EXPIRES_IN}m` },
-      );
+        const token = await signJWT(
+          { sub: data.id! },
+          { exp: `${JWT_EXPIRES_IN}m` },
+        );
 
-      const tokenMaxAge = parseInt(JWT_EXPIRES_IN) * 60;
+        const tokenMaxAge = parseInt(JWT_EXPIRES_IN) * 60;
 
-      const cookieOptions = {
-        name: "token",
-        value: token,
-        httpOnly: true,
-        path: "/",
-        secure: process.env.NODE_ENV !== "development",
-        maxAge: tokenMaxAge,
-      };
-
-      const response = new NextResponse(
-        JSON.stringify({
-          status: "success",
-          token: cookieOptions,
-          username: {
-            name: "username",
-            value: data.name,
-          },
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-
-      await Promise.all([
-        response.cookies.set(cookieOptions),
-        response.cookies.set({
-          name: "logged-in",
-          value: "true",
+        const cookieOptions = {
+          name: "token",
+          value: token,
+          httpOnly: true,
+          path: "/",
+          secure: process.env.NODE_ENV !== "development",
           maxAge: tokenMaxAge,
-        }),
-        response.cookies.set({
-          name: "username",
-          value: data.name!,
-        }),
-      ]);
+        };
 
-      const isUser = await prisma.user.findUnique({
-        where: {
-          email: data.name!,
-        },
-      });
+        const response = new NextResponse(
+          JSON.stringify({
+            status: "success",
+            token: cookieOptions,
+            username: {
+              name: "username",
+              value: data.name,
+            },
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
 
-      if (isUser) {
-        return response;
-      } else {
-        const hashedPassword = await hash(data.id!, 12);
+        await Promise.all([
+          response.cookies.set(cookieOptions),
+          response.cookies.set({
+            name: "logged-in",
+            value: "true",
+            maxAge: tokenMaxAge,
+          }),
+          response.cookies.set({
+            name: "username",
+            value: data.name!,
+          }),
+        ]);
 
-        await prisma.user.create({
-          data: {
-            id: data.id!,
-            name: data.family_name!,
+        const isUser = await prisma.user.findUnique({
+          where: {
             email: data.name!,
-            password: hashedPassword,
-            photo: data.picture,
           },
         });
-      }
 
-      return response;
+        if (isUser) {
+          return response;
+        } else {
+          const hashedPassword = await hash(data.id!, 12);
+
+          await prisma.user.create({
+            data: {
+              id: data.id!,
+              name: data.family_name!,
+              email: data.name!,
+              password: hashedPassword,
+              photo: data.picture,
+            },
+          });
+        }
+
+        return response;
+      }
+    } catch (error) {
+      return getErrorResponse(500, `${error}`);
     }
   }
 
-  return;
+  return getErrorResponse(500, "Нет пришел code");
 }

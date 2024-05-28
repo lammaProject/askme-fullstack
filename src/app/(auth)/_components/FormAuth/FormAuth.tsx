@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FormAuth } from "@/types/auth.interface";
-import useFormAuth from "@/app/(auth)/_hooks/useFormAuth";
-import useGoogleAuth from "@/app/(auth)/_hooks/useGoogleAuth";
+import useFormAuth from "@/app/(auth)/_components/FormAuth/useFormAuth";
+import useGoogleAuth from "@/app/(auth)/_components/FormAuth/useGoogleAuth";
+import { FormAuth } from "./formauth.interface";
 
 export default function FormAuth({
   title,
@@ -22,7 +22,9 @@ export default function FormAuth({
   const { googleAuth } = useGoogleAuth(setLoading);
 
   const handleSubmit = (formData: FormData) => {
-    formAuth.mutate({ linkApi, body: data(formData) });
+    let formDataAll: any = {};
+    data.forEach((i) => (formDataAll[i] = formData.get(i)));
+    formAuth.mutate({ linkApi, body: formDataAll });
   };
 
   const handleAuthGoogle = () => {

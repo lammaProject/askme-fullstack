@@ -1,4 +1,5 @@
 "use client";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { generateTokenAuthGoogle } from "@/app/(google)/_api/generateTokenAuthGoogle";
@@ -14,7 +15,7 @@ export default function Page() {
     if (code)
       tryFn(
         () => generateTokenAuthGoogle(code),
-        (error) => console.log(error),
+        () => alert("ERROR"),
       );
 
     setTimeout(() => {

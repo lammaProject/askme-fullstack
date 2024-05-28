@@ -5,7 +5,7 @@ const useTryCatch = () => {
   const setNotify = useDashboard((store) => store.setNotify);
 
   return [
-    (fn: () => Promise<void> | void, errFn: (error: unknown) => void) => {
+    (fn: () => void, errFn: (error: unknown) => void) => {
       try {
         return fn();
       } catch (error) {

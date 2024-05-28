@@ -1,4 +1,3 @@
-"use client";
 import FormAuth from "@/app/(auth)/_components/FormAuth/FormAuth";
 
 export default function Page() {
@@ -16,12 +15,7 @@ export default function Page() {
         },
       ]}
       linkApi={"/auth/register"}
-      data={(formData) => ({
-        name: formData.get("name"),
-        email: formData.get("email"),
-        password: formData.get("password"),
-        passwordConfirm: formData.get("passwordConfirm"),
-      })}
+      data={["name", "email", "password", "passwordConfirm"]}
       messageSuccess={"Вы успешно зарегестрировались!"}
       buttonText={"Зарегистрироваться"}
       titleMessage={"У вас уже есть аккаунт?"}

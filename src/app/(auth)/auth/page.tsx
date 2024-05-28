@@ -1,5 +1,3 @@
-"use client";
-
 import FormAuth from "@/app/(auth)/_components/FormAuth/FormAuth";
 
 export default function Page() {
@@ -15,10 +13,7 @@ export default function Page() {
         },
       ]}
       linkApi={"/auth/login"}
-      data={(formData) => ({
-        email: formData.get("email"),
-        password: formData.get("password"),
-      })}
+      data={["email", "password"]}
       messageSuccess={"Вы вошли"}
       buttonText={"Войти"}
       titleMessage={"Не зарегестрированы?"}
